@@ -5,6 +5,7 @@ import basicController from './controllers/basicController';
 import userController from './controllers/userController';
 import postController from './controllers/postController';
 import commentController from './controllers/commentController';
+import deleteController from './controllers/deleteController';
 
 const routes = express();
 
@@ -18,6 +19,9 @@ routes.post('/login', userController.post);
 /// Post routes
 routes.post('/newpost', postController.post);
 routes.get('/posts', postController.GetAll);
+
+/// Delete routes
+routes.delete('/:userId', deleteController.delete);
 
 /// Comment routes
 routes.post('/comment', commentController.post);
