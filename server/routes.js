@@ -12,7 +12,8 @@ const routes = express();
 routes.get('/', basicController.get);
 
 /// User routes
-routes.post('/signup', userController.post);
+routes.post('/login', userController.post);
+//routes.post('login', )
 
 /// Post routes
 routes.post('/newpost', postController.post);

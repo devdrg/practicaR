@@ -3,13 +3,18 @@ import db from '../models';
 const userController = {};
 
 userController.post = (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email, firstName, lastName } = req.body;
 
 // validation
 
+
+
 const user = new db.User({
     username,
-    password
+    password,
+    email,
+    firstName,
+    lastName
 });
 
 user.save().then( (newUser) => {
