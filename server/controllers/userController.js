@@ -2,63 +2,20 @@ import db from '../models';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-
 const userController = {};
 
-/*
-userController.post = (req, res) => {
-    /// check if email is available
-    /*if ( db.User.find({ email: req.body.email }) !== "undefined") {
-        res.status(500).json({
-            message: "email already taken"
-        });
-    };
 
+/// SIGN UP / REGISTER
 
+userController.register = (req, res) => {
 
-    db.User.find({ email: req.body.email }).then( () => {
-        res.status(500).json({
-            message: "email already taken"
-        });
-        next();
-    }).catch( () => {
-
-        const user = new db.User({
-            username,
-            password,
-            email,
-            firstName,
-            lastName
-        });
-
-        /// if yes, allow to create new user
-        const { username, password, email, firstName, lastName } = req.body;
-     
-    
-        user.save().then( (newUser) => {
-            res.status(200).json({
-                success: true,
-                data: newUser
-            }).catch( (err) => {
-                res.status(500).json({
-                    message: err
-                });
-            });
-    
-        });
-
-    });
-
-}; */
-
-userController.post = (req, res) => {
-
-    db.User.find({ email: req.body.email })
+    db.User.find( { $or: [{email: req.body.email }, { username: req.body.username }] })
     .exec()
     .then( (user) => {
-        if (user >= 1) {
-            res.status(500).json({
-                message: "email already taken"
+        if (user.length >= 1) {
+            console.log('register failed. email or username already taken');
+            res.status(400).json({
+                message: "email or username already taken"
             });
         } else {
             bcrypt.hash(req.body.password, 10, (err, hash) => {
@@ -92,32 +49,73 @@ userController.post = (req, res) => {
             });
         };
     });
-}
+};
 
+
+/// LOGIN / SIGN IN
 /*
-    db.User.find({ email: req.body.email })
-    .exec()
-    .then(user => {
-        if (user >= 1) {
-            res.status(500).json({
-                message: 'Email already exists'
+userController.login = async (req, res) => {
+    try {
+        const user = await db.User.findOne( { $or: [{email: req.body.email }, { username: req.body.username }] }).exec();
+        if (!user) {
+            return res.status(401).json({
+                message: "invalid username or email"
+            });
+        }
+
+        const match = await bcrypt.compare(req.body.password, user.password);
+
+        if (match) {
+            console.log('password correct');
+            res.status(200).json({
+                message: 'login success'
             });
         } else {
-            
-
-            
-                if(err) {
-                } else (hash) => {
-
-                }
+            console.log('password fail');
+            res.status(401).json({
+                message: 'incorrect password'
             });
-            
-
-
-
         };
+
+    } catch (err) {
+        return res.status(500).json({
+            message: err
+        });
+    }
+
+    */
+userController.login = (req, res) => {
+    db.User.findOne( { $or: [{email: req.body.email }, { username: req.body.username }] })
+    .exec()
+    .then( (user) => {
+        if (!user) {
+            res.status(401).json({
+                message: "invalid username or email"
+            });
+        } else {
+            console.log('user found, checking password');
+
+            bcrypt.compare(req.body.password, user.password, (err, result) => {
+                if (err) {
+                    res.status(500).json({
+                        message: err
+                    });
+                }
+                else if (!result) {
+                    console.log('password fail');
+                    res.status(401).json({
+                        message: 'incorrect password'
+                    });
+                }
+                else if (result){
+                    console.log('password correct');
+                    res.status(200).json({
+                        message: 'login success'
+                    });
+                };
+            });
+        }
     });
 };
-*/
 
 export default userController;

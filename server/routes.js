@@ -13,8 +13,8 @@ const routes = express();
 routes.get('/', basicController.get);
 
 /// User routes
-routes.post('/login', userController.post);
-//routes.post('login', )
+routes.post('/register', userController.register);
+routes.post('/login', userController.login);
 
 /// Post routes
 routes.post('/newpost', postController.post);
